@@ -1,0 +1,97 @@
+<html>
+<head>
+  <title>The Rabbit Hole</title>
+  <style type="text/css">
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #canvas {
+      border-width: 1px;
+      border-style: solid;
+      border-width: 1px;
+      display: block;
+      margin: 10 auto;
+    }
+  </style>
+  <script type="text/javascript" src="Entity.js"></script>
+  <script type="text/javascript" src="Page.js"></script>
+  <script type="text/javascript" src="Input.js"></script>
+  <script type="text/javascript" src="Clonehood.js"></script>
+  <script type="text/javascript" src="GridMaker.js"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+      page = new Page(document.getElementById("canvas"));
+      page.tool = "brick";
+
+      platform = new Clonehood();
+      page.add(platform);
+
+      buttons = new Clonehood();
+      page.add(buttons);
+
+      brickButton = new Button(10, 10, new Brick(0, 0, 20, 20));
+      brickButton.click = function(page) {
+        page.tool = "brick";
+      };
+      buttons.add(brickButton);
+
+      deleteSymbol = new Entity(0, 0, 20, 20);
+      deleteSymbol.draw = function(page) {
+        page.ctx.strokeStyle = "black";
+        page.ctx.lineWidth = 1;
+        page.ctx.beginPath();
+        page.ctx.rect(this.x, this.y, this.width, this.height);
+        page.ctx.closePath();
+        page.ctx.stroke();
+        page.ctx.strokeStyle = "red";
+        page.ctx.moveTo(this.x, this.y);
+        page.ctx.lineTo(this.x+this.width, this.y+this.height);
+        page.ctx.stroke();
+        page.ctx.moveTo(this.x+this.width, this.y);
+        page.ctx.lineTo(this.x, this.y+this.height);
+        page.ctx.stroke();
+      };
+      deleteButton = new Button(10, 45, deleteSymbol);
+      deleteButton.click = function(page) {
+        page.tool = "delete";
+      };
+      buttons.add(deleteButton);
+
+      ladderButton = new Button(10, 80, new Ladder(0, 0, 20, 20));
+      ladderButton.click = function(page) {
+        page.tool = "ladder";
+      };
+      buttons.add(ladderButton);
+
+      cb1 = new CursorBrick(platform);
+      page.add(cb1);
+
+      page.drive = function() {
+        if (document.keys[87]) {
+          this.camY += 5;
+        }
+        if (document.keys[65]) {
+          this.camX += 5;
+        }
+        if (document.keys[83]) {
+          this.camY -= 5;
+        }
+        if (document.keys[68]) {
+          this.camX -= 5;
+        }
+        if (buttons.isTouching(this.mouse)) {
+          this.canvas.style.cursor = "pointer";
+        }
+        else {
+          this.canvas.style.cursor = "default";
+        }
+      };
+      page.start();
+    });
+  </script>
+</head>
+<body>
+  <canvas id = "canvas" width=600 height=450></canvas>
+</body>
+</html>
