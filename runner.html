@@ -1,0 +1,81 @@
+<html>
+<head>
+  <title>The Rabbit Hole</title>
+  <style type="text/css">
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #canvas {
+      border-width: 1px;
+      border-style: solid;
+      border-width: 1px;
+      display: block;
+      margin: 10 auto;
+    }
+  </style>
+  <script type="text/javascript" src="Entity.js"></script>
+  <script type="text/javascript" src="Page.js"></script>
+  <script type="text/javascript" src="Input.js"></script>
+  <script type="text/javascript" src="Clonehood.js"></script>
+  <script type="text/javascript" src="GridMaker.js"></script>
+  <script type="text/javascript">
+    world = {"objects":[{"x":120,"y":260,"width":20,"height":20,"type":"Brick"},{"x":140,"y":260,"width":20,"height":20,"type":"Brick"},{"x":160,"y":260,"width":20,"height":20,"type":"Brick"},{"x":180,"y":260,"width":20,"height":20,"type":"Brick"},{"x":200,"y":260,"width":20,"height":20,"type":"Brick"},{"x":220,"y":260,"width":20,"height":20,"type":"Brick"},{"x":240,"y":260,"width":20,"height":20,"type":"Brick"},{"x":260,"y":260,"width":20,"height":20,"type":"Brick"},{"x":120,"y":160,"width":20,"height":20,"type":"Brick"},{"x":140,"y":160,"width":20,"height":20,"type":"Brick"},{"x":160,"y":160,"width":20,"height":20,"type":"Brick"},{"x":180,"y":160,"width":20,"height":20,"type":"Brick"},{"x":200,"y":160,"width":20,"height":20,"type":"Brick"},{"x":220,"y":160,"width":20,"height":20,"type":"Brick"},{"x":260,"y":160,"width":20,"height":20,"type":"Brick"}]};
+    newWorld = new Clonehood();
+    //break up the world by block type
+    var types = [];
+    for (var i = 0; i < world.objects.length; i++) {
+      if (types.indexOf(world.objects[i].type) == -1) {
+        types.push(world.objects[i].type);
+      }
+    }
+    for (var i = 0; i<types.length; i++) {
+      var currentTypeBlocks = [];
+      for (var a = 0; a<world.objects.length; a++) {
+        if (world.objects[a].type == types[i]) {
+          currentTypeBlocks.push(world.objects[a]);
+        }
+      }
+      var rows = [];
+      for (var a = 0; a<currentTypeBlocks.length; a++) {
+        if (rows.indexOf(currentTypeBlocks[a].y) == -1) {
+          rows.push(currentTypeBlocks[a].y);
+          rows.sort();
+        }
+      }
+      for (var a = 0; a < rows.length; a++) {
+        var inThisRow = [];
+        for (var b = 0; b<currentTypeBlocks.length; b++) {
+          if (currentTypeBlocks[b].y == rows[a]) {
+            inThisRow.push(currentTypeBlocks[b]);
+          }
+        }
+        //For every block "inThisRow", add a Rect to newWorld whose height is 20
+        //and whose width is 20 * the number of sequential blocks
+        var blockWidth = 1;
+        var currentCol = 0;
+        for (var b = 1; b<inThisRow.length; b++) {
+          if (inThisRow[b].x == inThisRow[b-1].x+20) {
+            blockWidth++;
+          }
+          else {
+            currentCol = b;
+            newWorld.add(new Entity(inThisRow[currentCol].x, inThisRow[currentCol].y, 20+20*blockWidth, 20));
+            blockWidth = 1;
+          }
+        }
+      }
+    }
+    document.addEventListener("DOMContentLoaded", function() {
+      page = new Page(document.getElementById("canvas"));
+
+      page.add(newWorld);
+
+      page.start();
+    });
+  </script>
+</head>
+<body>
+  <canvas id = "canvas" width=600 height=450></canvas>
+</body>
+</html>
